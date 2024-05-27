@@ -333,8 +333,10 @@ int isTreeEmpty(clasament *root)
 }
 clasament *insert(clasament *nod, echipa *key)
 {
+    //daca (sub)arborele este gol, creeaza nod
     if(nod == NULL)
         return nodNou(key);
+    //altfel, coboara la stanga sau la dreapta, verificand conditia cu punctajul
     if((key->punctaj < nod->echipe->punctaj) || (key->punctaj == nod->echipe->punctaj && strcmp(key->nume, nod->echipe->nume) < 0))
         nod->left = insert(nod->left, key);
     else if((key->punctaj > nod->echipe->punctaj) || (key->punctaj == nod->echipe->punctaj && strcmp(key->nume, nod->echipe->nume) > 0))
@@ -378,8 +380,10 @@ arbore *leftRotation(arbore *z)
 {
     arbore *y = z->right;
     arbore *T2 = y->left;
+    //roteste
     y->left = z;
     z->right = T2;
+    //modifica inaltimile pentru z si y
     z->height = max(nodeHeight(z->left), nodeHeight(z->right)) + 1;
     y->height = max(nodeHeight(y->left), nodeHeight(y->right)) + 1;
     return y;
@@ -410,6 +414,7 @@ int max(int a, int b)
 }
 arbore *insertArbore(arbore *nod, echipa *nou)
 {
+    //inserare nod
     if(nod == NULL)
     {
         nod = (arbore*)malloc(sizeof(arbore));
@@ -417,7 +422,7 @@ arbore *insertArbore(arbore *nod, echipa *nou)
         nod->echipe->nume = (char*)malloc(sizeof(char) * strlen(nou->nume));
         strcpy(nod->echipe->nume, nou->nume);
         nod->echipe->punctaj = nou->punctaj;
-        nod->height = 0; 
+        nod->height = 0; //adaugare ca frunza
         nod->left = nod->right = NULL;
         return nod;
     }
@@ -426,9 +431,13 @@ arbore *insertArbore(arbore *nod, echipa *nou)
     else if(nou->punctaj > nod->echipe->punctaj || (nou->punctaj == nod->echipe->punctaj && strcmp(nou->nume, nod->echipe->nume) > 0))
         nod->right = insertArbore(nod->right, nou);
     else
-        return nod;
+        return nod; //nu exista chei duplicat
+    //updateaza inaltimea nodurilor stramos de jos in sus la iesirea din apelul recurent
     nod->height = 1 + max(nodeHeight(nod->left), nodeHeight(nod->right));
+    //afla factorul de echilibru al nodului stramos
+    //testul se face de jos in sus pentru toate nodurile intre cel adaugat si radacina
     int k  = (nodeHeight(nod->left) - nodeHeight(nod->right));
+    //daca arborele nu e echilibrat, echilibreaza in fct de punctaj
     if((k > 1 && nou->punctaj < nod->left->echipe->punctaj) || (k > 1 && nou->punctaj == nod->left->echipe->punctaj && strcmp(nou->nume, nod->left->echipe->nume) < 0))
         return rightRotation(nod);
     if(k < -1 && nou->punctaj > nod->right->echipe->punctaj || (k < -1 && nou->punctaj == nod->left->echipe->punctaj && strcmp(nou->nume, nod->left->echipe->nume) > 0))
@@ -437,7 +446,7 @@ arbore *insertArbore(arbore *nod, echipa *nou)
         return LRRotation(nod);
     if(k < -1 && nou->punctaj < nod->right->echipe->punctaj || (k < -1 && nou->punctaj == nod->left->echipe->punctaj && strcmp(nou->nume, nod->left->echipe->nume) < 0))
         return RLRotation(nod);
-    return nod;
+    return nod; //returneaza nodul nemodificat
 }
 void adaugareDinBSTinLista(clasament *root, echipa **head)
 {
