@@ -49,6 +49,11 @@ int main(int argc, char *argv[])
         stiva *top_necastigatori = NULL;
         afisareEchipaCastigatoare(f_out, &top_castigatori, &top_necastigatori, q, heade, &lista8);
     }
+
+    //cerinta 4
+    clasament *root = NULL;
+    if(*(cerinta+3) == 1)
+        afisareBST(f_out, lista8, &root);
     fclose(f_out);
     return 0;
 }

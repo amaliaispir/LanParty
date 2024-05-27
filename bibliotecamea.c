@@ -318,3 +318,50 @@ void afisareEchipaCastigatoare(FILE *f_out, stiva **top_castigatori, stiva **top
         nr_echipe = nr_echipe / 2;
     }
 }
+
+//BST
+clasament *nodNou(echipa *echipa_noua)
+{
+    clasament *nod = (clasament*)malloc(sizeof(clasament));
+    nod->echipe = echipa_noua;
+    nod->left = nod->right = NULL;
+    return nod;
+}
+int isTreeEmpty(clasament *root)
+{
+    return (root == NULL);
+}
+clasament *insert(clasament *nod, echipa *key)
+{
+    if(nod == NULL)
+        return nodNou(key);
+    if((key->punctaj < nod->echipe->punctaj) || (key->punctaj == nod->echipe->punctaj && strcmp(key->nume, nod->echipe->nume) < 0))
+        nod->left = insert(nod->left, key);
+    else if((key->punctaj > nod->echipe->punctaj) || (key->punctaj == nod->echipe->punctaj && strcmp(key->nume, nod->echipe->nume) > 0))
+        nod->right = insert(nod->right, key);
+    return nod;
+}
+void inorder(FILE *f_out, clasament *root)
+{
+    if(root)
+    {
+        inorder(f_out,root->right);
+        fprintf(f_out, "%s ", root->echipe->nume);
+        afisareCuSpatii(f_out,root->echipe);
+        fprintf(f_out, "-  %.2f\n", root->echipe->punctaj);
+        inorder(f_out,root->left);
+    }
+}
+void afisareBST(FILE *f_out, top8 *lista8, clasament **root)
+{
+    fprintf(f_out, "\nTOP 8 TEAMS:\n");
+    while(lista8 != NULL)
+    {
+        (*root) = insert((*root), lista8->castigatoare);
+        top8 *aux = lista8;
+        eliberareMemorieListeEchipe(aux->castigatoare);
+        lista8 = lista8->next;
+    }
+    free(lista8);
+    inorder(f_out, (*root));
+}

@@ -37,6 +37,11 @@ typedef struct top8
     echipa *castigatoare;
     struct top8 *next;
 }top8;
+typedef struct clasament
+{
+    echipa *echipe;
+    struct clasament *left, *right;
+}clasament;
 //lista
 void adaugareJucator(jucator **head, char *nume, char *prenume, int punctaj);
 void adaugareEchipa(echipa **head, jucator *jucator_nou, int nr_jucatori, char *nume);
@@ -61,3 +66,9 @@ int nrEchipe(echipa *heade);
 void initializareCoada(coada **q, echipa *heade);
 void adaugareInLista8(top8 **head, echipa *castigatoare);
 void afisareEchipaCastigatoare(FILE *f_out, stiva **top_castigatori, stiva **top_necastigatori, coada *q, echipa *heade, top8 **lista8);
+//bst
+clasament *nodNou(echipa *echipa_noua);
+int isTreeEmpty(clasament *root);
+clasament *insert(clasament *nod, echipa *key);
+void inorder(FILE *f_out, clasament *root);
+void afisareBST(FILE *f_out, top8 *lista8, clasament **root);
