@@ -38,6 +38,17 @@ int main(int argc, char *argv[])
         eliminareEchipe(&heade, nr_echipe);
     }
     scriereInFisier(f_out, heade);
+
+    //cerinta 3
+    top8 *lista8 = NULL;
+    if(*(cerinta+2) == 1)
+    {   
+        fprintf(f_out,"\n");
+        coada *q;
+        stiva *top_castigatori = NULL;
+        stiva *top_necastigatori = NULL;
+        afisareEchipaCastigatoare(f_out, &top_castigatori, &top_necastigatori, q, heade, &lista8);
+    }
     fclose(f_out);
     return 0;
 }
