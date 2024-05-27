@@ -42,6 +42,12 @@ typedef struct clasament
     echipa *echipe;
     struct clasament *left, *right;
 }clasament;
+typedef struct arbore
+{
+    int height;
+    echipa *echipe;
+    struct arbore *left, *right;
+}arbore;
 //lista
 void adaugareJucator(jucator **head, char *nume, char *prenume, int punctaj);
 void adaugareEchipa(echipa **head, jucator *jucator_nou, int nr_jucatori, char *nume);
@@ -72,3 +78,14 @@ int isTreeEmpty(clasament *root);
 clasament *insert(clasament *nod, echipa *key);
 void inorder(FILE *f_out, clasament *root);
 void afisareBST(FILE *f_out, top8 *lista8, clasament **root);
+//avl
+int nodeHeight(arbore *root);
+arbore *leftRotation(arbore *z);
+arbore *rightRotation(arbore *z);
+arbore *LRRotation(arbore *Z);
+arbore *RLRotation(arbore *Z);
+arbore *insertArbore(arbore *nod, echipa *nou);
+int max(int a, int b);
+void adaugareDinBSTinLista(clasament *root, echipa **head);
+void printLevel(FILE *f_out, arbore *root, int level);
+void afisareAVL(FILE *f_out, arbore *avl, echipa *head, clasament *root);

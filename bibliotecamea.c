@@ -365,3 +365,119 @@ void afisareBST(FILE *f_out, top8 *lista8, clasament **root)
     free(lista8);
     inorder(f_out, (*root));
 }
+
+//AVL
+int nodeHeight(arbore *root)
+{
+    if(root == NULL)
+        return -1; 
+    else
+        return root->height;
+}
+arbore *leftRotation(arbore *z)
+{
+    arbore *y = z->right;
+    arbore *T2 = y->left;
+    y->left = z;
+    z->right = T2;
+    z->height = max(nodeHeight(z->left), nodeHeight(z->right)) + 1;
+    y->height = max(nodeHeight(y->left), nodeHeight(y->right)) + 1;
+    return y;
+}
+arbore *rightRotation(arbore *z)
+{
+    arbore *y = z->left;
+    arbore *T3 = y->right;
+    y->right = z;
+    z->left = T3;
+    z->height = max(nodeHeight(z->left), nodeHeight(z->right)) + 1;
+    y->height = max(nodeHeight(y->left), nodeHeight(y->right)) + 1;
+    return y;
+}
+arbore *LRRotation(arbore *Z)
+{
+    Z->left = leftRotation(Z->left);
+    return rightRotation(Z);
+}
+arbore *RLRotation(arbore *Z)
+{
+    Z->right = rightRotation(Z->right);
+    return leftRotation(Z);
+}
+int max(int a, int b)
+{
+    return ((a > b) ? a : b);
+}
+arbore *insertArbore(arbore *nod, echipa *nou)
+{
+    if(nod == NULL)
+    {
+        nod = (arbore*)malloc(sizeof(arbore));
+        nod->echipe = (echipa*)malloc(sizeof(echipa));
+        nod->echipe->nume = (char*)malloc(sizeof(char) * strlen(nou->nume));
+        strcpy(nod->echipe->nume, nou->nume);
+        nod->echipe->punctaj = nou->punctaj;
+        nod->height = 0; 
+        nod->left = nod->right = NULL;
+        return nod;
+    }
+    if(nou->punctaj < nod->echipe->punctaj || (nou->punctaj == nod->echipe->punctaj && strcmp(nou->nume, nod->echipe->nume) < 0))
+        nod->left = insertArbore(nod->left, nou);
+    else if(nou->punctaj > nod->echipe->punctaj || (nou->punctaj == nod->echipe->punctaj && strcmp(nou->nume, nod->echipe->nume) > 0))
+        nod->right = insertArbore(nod->right, nou);
+    else
+        return nod;
+    nod->height = 1 + max(nodeHeight(nod->left), nodeHeight(nod->right));
+    int k  = (nodeHeight(nod->left) - nodeHeight(nod->right));
+    if((k > 1 && nou->punctaj < nod->left->echipe->punctaj) || (k > 1 && nou->punctaj == nod->left->echipe->punctaj && strcmp(nou->nume, nod->left->echipe->nume) < 0))
+        return rightRotation(nod);
+    if(k < -1 && nou->punctaj > nod->right->echipe->punctaj || (k < -1 && nou->punctaj == nod->left->echipe->punctaj && strcmp(nou->nume, nod->left->echipe->nume) > 0))
+        return leftRotation(nod);
+    if(k > 1 && nou->punctaj > nod->left->echipe->punctaj || (k > 1 && nou->punctaj == nod->left->echipe->punctaj && strcmp(nou->nume, nod->left->echipe->nume) > 0))
+        return LRRotation(nod);
+    if(k < -1 && nou->punctaj < nod->right->echipe->punctaj || (k < -1 && nou->punctaj == nod->left->echipe->punctaj && strcmp(nou->nume, nod->left->echipe->nume) < 0))
+        return RLRotation(nod);
+    return nod;
+}
+void adaugareDinBSTinLista(clasament *root, echipa **head)
+{
+    if(root)
+    {
+        adaugareDinBSTinLista(root->left, head);
+        echipa *noua = (echipa*)malloc(sizeof(echipa));
+        noua->punctaj = root->echipe->punctaj;
+        noua->nume = (char*)malloc(sizeof(char) * strlen(root->echipe->nume));
+        strcpy(noua->nume, root->echipe->nume);
+        eliberareMemorieListeEchipe(root->echipe);
+        free(root);
+        noua->next = *head;
+        *head = noua;
+        adaugareDinBSTinLista(root->right, head);
+    }
+}
+void printLevel(FILE *f_out, arbore *root, int level)
+{
+    if(root == NULL)
+        return;
+    if(level == 0) //consideram 0 nivelul radacinii
+        fprintf(f_out, "%s\n", root->echipe->nume);
+    else if(level > 0)
+    {
+        printLevel(f_out, root->right, level-1);
+        printLevel(f_out, root->left, level-1);
+    }
+}
+void afisareAVL(FILE *f_out, arbore *avl, echipa *head, clasament *root)
+{
+    fprintf(f_out, "\n");
+    adaugareDinBSTinLista(root, &head);
+    do
+    {
+        avl = insertArbore(avl, head);
+        echipa *aux = head;
+        eliberareMemorieListeEchipe(head);
+        head = head->next;
+    }while(head != NULL);
+    fprintf(f_out, "THE LEVEL 2 TEAMS ARE: \n");
+    printLevel(f_out, avl, 2); 
+}

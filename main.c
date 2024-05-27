@@ -54,6 +54,14 @@ int main(int argc, char *argv[])
     clasament *root = NULL;
     if(*(cerinta+3) == 1)
         afisareBST(f_out, lista8, &root);
+
+    //cerinta 5
+    if(*(cerinta+4) == 1)
+    {
+        echipa *head = NULL;
+        arbore *avl = NULL;
+        afisareAVL(f_out, avl, head, root);
+    }
     fclose(f_out);
     return 0;
 }
