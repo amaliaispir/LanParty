@@ -61,3 +61,64 @@ void scriereInFisier(FILE *f_out, echipa *heade)
         curr = curr->next;
     }
 }
+float calcPunctajMinim(echipa *heade)
+{
+    echipa *curre = heade;
+    float mini = curre->punctaj;
+    while(curre != NULL)
+    {
+        if(curre->punctaj < mini)
+            mini = curre->punctaj;
+        curre = curre->next;
+    }
+    return mini;
+}
+void eliberareMemorieListeEchipe(echipa *e)
+{
+    jucator *j = e->jucatori;
+    while(j != NULL)
+    {
+        jucator *auxj = j;
+        j = j->next;
+        free(auxj);
+    }
+}
+void eliminareEchipe(echipa **heade, int nr_echipe)
+{
+    int n = 1;
+    while(n * 2 <= nr_echipe)
+        n = n * 2;
+    while(nr_echipe != n)
+    {
+        echipa *curre = *heade;
+        float mini = calcPunctajMinim(curre);
+        curre = *heade;
+        int gasit = 1;
+        //verific daca echipa care trebuie eliminata este prima si daca da, o elimin
+        if(mini == curre->punctaj)
+        {
+            *heade = (*heade)->next;
+            eliberareMemorieListeEchipe(curre);
+        }
+        else
+        {   //daca nu e prima echipa, caut echipa cu punctajul minim si o elimin
+            echipa *prev = curre;
+            curre = curre->next;
+            while(curre != NULL && gasit)
+            {
+                if(mini == curre->punctaj) //daca am gasit echipa ma opresc 
+                {
+                    prev->next = curre->next;
+                    eliberareMemorieListeEchipe(curre);
+                    gasit = 0;
+                }
+                else //caut in continuare echipa
+                {
+                    prev = curre;
+                    curre = curre->next;
+                }
+            }
+        }
+        nr_echipe--;
+    }
+}

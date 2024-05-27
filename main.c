@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     for(int i = 0; i < 5; i++)
         fscanf(f_cerinte, "%d", cerinta + i);
     fclose(f_cerinte);
-
+    
     //cerinta 1
     int nr_echipe;
     echipa *heade = NULL;
