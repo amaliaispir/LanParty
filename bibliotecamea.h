@@ -21,3 +21,6 @@ void adaugareJucator(jucator **head, char *nume, char *prenume, int punctaj);
 void adaugareEchipa(echipa **head, jucator *jucator_nou, int nr_jucatori, char *nume);
 void citireDinFisier(FILE *f_date, echipa **heade, int *nr_echipe);
 void scriereInFisier(FILE *f_out, echipa *heade);
+float calcPunctajMinim(echipa *heade);
+void eliberareMemorieListeEchipe(echipa *e);
+void eliminareEchipe(echipa **heade, int nr_echipe);

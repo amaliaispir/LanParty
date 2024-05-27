@@ -31,6 +31,12 @@ int main(int argc, char *argv[])
         citireDinFisier(f_date, &heade, &nr_echipe);
     }
     fclose(f_date);
+    
+    //cerinta 2
+    if(*(cerinta+1) == 1)
+    {
+        eliminareEchipe(&heade, nr_echipe);
+    }
     scriereInFisier(f_out, heade);
     fclose(f_out);
     return 0;
