@@ -54,34 +54,24 @@ void citireDinFisier(FILE *f_date, echipa **heade, int *nr_echipe)
 }
 void scriereInFisier(FILE *f_out, echipa *heade)
 {
-    echipa *curr = heade;
-    while(curr != NULL)
+    echipa *aux = heade;
+    while(aux != NULL)
     {
-        fprintf(f_out, "%s\n", curr->nume);
-        curr = curr->next;
+        fprintf(f_out, "%s\n", aux->nume);
+        aux = aux->next;
     }
 }
 float calcPunctajMinim(echipa *heade)
 {
-    echipa *curre = heade;
-    float mini = curre->punctaj;
-    while(curre != NULL)
+    echipa *aux = heade;
+    float mini = aux->punctaj;
+    while(aux != NULL)
     {
-        if(curre->punctaj < mini)
-            mini = curre->punctaj;
-        curre = curre->next;
+        if(aux->punctaj < mini)
+            mini = aux->punctaj;
+        aux = aux->next;
     }
     return mini;
-}
-void eliberareMemorieListeEchipe(echipa *e)
-{
-    jucator *j = e->jucatori;
-    while(j != NULL)
-    {
-        jucator *auxj = j;
-        j = j->next;
-        free(auxj);
-    }
 }
 void eliminareEchipe(echipa **heade, int nr_echipe)
 {
@@ -90,32 +80,32 @@ void eliminareEchipe(echipa **heade, int nr_echipe)
         n = n * 2;
     while(nr_echipe != n)
     {
-        echipa *curre = *heade;
-        float mini = calcPunctajMinim(curre);
-        curre = *heade;
+        echipa *aux = *heade;
+        float mini = calcPunctajMinim(aux);
+        aux = *heade;
         int gasit = 1;
         //verific daca echipa care trebuie eliminata este prima si daca da, o elimin
-        if(mini == curre->punctaj)
+        if(mini == aux->punctaj)
         {
             *heade = (*heade)->next;
-            eliberareMemorieListeEchipe(curre);
+            free(aux);
         }
         else
         {   //daca nu e prima echipa, caut echipa cu punctajul minim si o elimin
-            echipa *prev = curre;
-            curre = curre->next;
-            while(curre != NULL && gasit)
+            echipa *prev = aux;
+            aux = aux->next;
+            while(aux != NULL && gasit)
             {
-                if(mini == curre->punctaj) //daca am gasit echipa ma opresc 
+                if(mini == aux->punctaj) //daca am gasit echipa ma opresc 
                 {
-                    prev->next = curre->next;
-                    eliberareMemorieListeEchipe(curre);
+                    prev->next = aux->next;
+                    free(aux);
                     gasit = 0;
                 }
                 else //caut in continuare echipa
                 {
-                    prev = curre;
-                    curre = curre->next;
+                    prev = aux;
+                    aux = aux->next;
                 }
             }
         }
@@ -131,7 +121,7 @@ coada *creareCoada()
     q->front = q->rear = NULL;
     return q;
 }
-int isQueueEmpty(coada* q)
+int coadaEsteGoala(coada* q)
 {
     return (q->front == NULL);
 }
@@ -145,10 +135,6 @@ void adaugareUnMeciInCoada(coada *q, echipa *heade)
         meci_nou->echipa1 = echipa1;
         meci_nou->echipa2 = echipa2;
         meci_nou->next = NULL;
-        echipa *aux1 = echipa1;
-        echipa *aux2 = echipa2;
-        eliberareMemorieListeEchipe(aux1);
-        eliberareMemorieListeEchipe(aux2);
         //daca nu exista niciun element in coada
         if(q->rear == NULL)
             q->rear = meci_nou;
@@ -186,9 +172,9 @@ void afisareMeciuri(FILE *f_out, coada *q)
     }
     fprintf(f_out, "\n");
 }
-void deQueue(coada *q, echipa **d1, echipa **d2)
+void extragereEchipeDinCoada(coada *q, echipa **d1, echipa **d2)
 {
-    if(isQueueEmpty(q)) 
+    if(coadaEsteGoala(q)) 
     {
         (*d1) = NULL;
         (*d2) = NULL;
@@ -199,49 +185,47 @@ void deQueue(coada *q, echipa **d1, echipa **d2)
     q->front = (q->front)->next;
     if(q->front == NULL)
         q->rear = NULL;
-    eliberareMemorieListeEchipe(aux->echipa1);
-    eliberareMemorieListeEchipe(aux->echipa2);
     free(aux);
 }
 
 //stiva
-int isStackEmpty(stiva *s)
+int stivaEsteGoala(stiva *s)
 {
     return (s == NULL);
 }
-void push(stiva **top_castigatori, echipa *head_echipa)
+void adaugareEchipaInStiva(stiva **top_castigatori, echipa *head_echipa)
 {
     stiva *nou = (stiva*)malloc(sizeof(stiva));
     nou->echipe = head_echipa;
     nou->next = *top_castigatori;
     *top_castigatori = nou;
 }
-echipa *pop(stiva **s)
-{
-    if(isStackEmpty(*s))
+echipa *extragereEchipaDinStiva(stiva **s)
+{   // returneaza informatia stocata in varf si sterge nodul
+    if(stivaEsteGoala(*s))  
         return NULL;
-    stiva *temp = (*s);
-    echipa *aux = (*s)->echipe;
+    stiva *temp = (*s); //stocheaza adresa varfului in temp
+    echipa *aux = (*s)->echipe; //stocheaza valoarea din varf in aux
+    //sterge elementul din varf
     *s = (*s)->next;
-    eliberareMemorieListeEchipe(temp->echipe);
     free(temp);
     return aux;
 }
 void aflareCastigatoriSiNecastigatori(stiva **top_castigatori, stiva **top_necastigatori, coada *q)
 {
-    while(!isQueueEmpty(q))
+    while(!coadaEsteGoala(q))
     {
         echipa *echipa1 = NULL, *echipa2 = NULL;
-        deQueue(q, &echipa1, &echipa2);
+        extragereEchipeDinCoada(q, &echipa1, &echipa2);
         if(echipa1->punctaj > echipa2->punctaj)
         {
-            push(top_castigatori, echipa1);
-            push(top_necastigatori, echipa2);
+            adaugareEchipaInStiva(top_castigatori, echipa1);
+            adaugareEchipaInStiva(top_necastigatori, echipa2);
         }
         else
         {
-            push(top_castigatori, echipa2);
-            push(top_necastigatori, echipa1);
+            adaugareEchipaInStiva(top_castigatori, echipa2);
+            adaugareEchipaInStiva(top_necastigatori, echipa1);
         }
         (*top_castigatori)->echipe->punctaj++;
     }
@@ -290,13 +274,13 @@ void afisareEchipaCastigatoare(FILE *f_out, stiva **top_castigatori, stiva **top
         fprintf(f_out,"--- ROUND NO:%d\n", n);
         afisareMeciuri(f_out,q);
         aflareCastigatoriSiNecastigatori(top_castigatori, top_necastigatori, q);
-        while(!isStackEmpty(*top_necastigatori))
-            pop(top_necastigatori);             //golim stiva necastigatori
+        while(!stivaEsteGoala(*top_necastigatori))
+            extragereEchipaDinStiva(top_necastigatori);             //golim stiva necastigatori
         fprintf(f_out,"WINNERS OF ROUND NO:%d\n", n++);
-        while(!isStackEmpty(*top_castigatori))
+        while(!stivaEsteGoala(*top_castigatori))
         {
-            echipa *echipe = pop(top_castigatori);
-            echipa *echipe1 = pop(top_castigatori);
+            echipa *echipe = extragereEchipaDinStiva(top_castigatori);
+            echipa *echipe1 = extragereEchipaDinStiva(top_castigatori);
             if(nr_echipe / 2 == 8)                             
             {
                 adaugareInLista8(lista8, echipe1);
@@ -327,20 +311,16 @@ clasament *nodNou(echipa *echipa_noua)
     nod->left = nod->right = NULL;
     return nod;
 }
-int isTreeEmpty(clasament *root)
-{
-    return (root == NULL);
-}
-clasament *insert(clasament *nod, echipa *key)
+clasament *inserareEchipaInBST(clasament *nod, echipa *key)
 {
     //daca (sub)arborele este gol, creeaza nod
     if(nod == NULL)
         return nodNou(key);
     //altfel, coboara la stanga sau la dreapta, verificand conditia cu punctajul
     if((key->punctaj < nod->echipe->punctaj) || (key->punctaj == nod->echipe->punctaj && strcmp(key->nume, nod->echipe->nume) < 0))
-        nod->left = insert(nod->left, key);
+        nod->left = inserareEchipaInBST(nod->left, key);
     else if((key->punctaj > nod->echipe->punctaj) || (key->punctaj == nod->echipe->punctaj && strcmp(key->nume, nod->echipe->nume) > 0))
-        nod->right = insert(nod->right, key);
+        nod->right = inserareEchipaInBST(nod->right, key);
     return nod;
 }
 void inorder(FILE *f_out, clasament *root)
@@ -359,9 +339,7 @@ void afisareBST(FILE *f_out, top8 *lista8, clasament **root)
     fprintf(f_out, "\nTOP 8 TEAMS:\n");
     while(lista8 != NULL)
     {
-        (*root) = insert((*root), lista8->castigatoare);
-        top8 *aux = lista8;
-        eliberareMemorieListeEchipe(aux->castigatoare);
+        (*root) = inserareEchipaInBST((*root), lista8->castigatoare);
         lista8 = lista8->next;
     }
     free(lista8);
@@ -412,7 +390,7 @@ int max(int a, int b)
 {
     return ((a > b) ? a : b);
 }
-arbore *insertArbore(arbore *nod, echipa *nou)
+arbore *inserareEchipaInArbore(arbore *nod, echipa *nou)
 {
     //inserare nod
     if(nod == NULL)
@@ -427,9 +405,9 @@ arbore *insertArbore(arbore *nod, echipa *nou)
         return nod;
     }
     if(nou->punctaj < nod->echipe->punctaj || (nou->punctaj == nod->echipe->punctaj && strcmp(nou->nume, nod->echipe->nume) < 0))
-        nod->left = insertArbore(nod->left, nou);
+        nod->left = inserareEchipaInArbore(nod->left, nou);
     else if(nou->punctaj > nod->echipe->punctaj || (nou->punctaj == nod->echipe->punctaj && strcmp(nou->nume, nod->echipe->nume) > 0))
-        nod->right = insertArbore(nod->right, nou);
+        nod->right = inserareEchipaInArbore(nod->right, nou);
     else
         return nod; //nu exista chei duplicat
     //updateaza inaltimea nodurilor stramos de jos in sus la iesirea din apelul recurent
@@ -457,14 +435,14 @@ void adaugareDinBSTinLista(clasament *root, echipa **head)
         noua->punctaj = root->echipe->punctaj;
         noua->nume = (char*)malloc(sizeof(char) * strlen(root->echipe->nume));
         strcpy(noua->nume, root->echipe->nume);
-        eliberareMemorieListeEchipe(root->echipe);
+        free(root->echipe);
         free(root);
         noua->next = *head;
         *head = noua;
         adaugareDinBSTinLista(root->right, head);
     }
 }
-void printLevel(FILE *f_out, arbore *root, int level)
+void afisareNivel(FILE *f_out, arbore *root, int level)
 {
     if(root == NULL)
         return;
@@ -472,21 +450,81 @@ void printLevel(FILE *f_out, arbore *root, int level)
         fprintf(f_out, "%s\n", root->echipe->nume);
     else if(level > 0)
     {
-        printLevel(f_out, root->right, level-1);
-        printLevel(f_out, root->left, level-1);
+        afisareNivel(f_out, root->right, level-1);
+        afisareNivel(f_out, root->left, level-1);
     }
 }
 void afisareAVL(FILE *f_out, arbore *avl, echipa *head, clasament *root)
 {
-    fprintf(f_out, "\n");
     adaugareDinBSTinLista(root, &head);
     do
     {
-        avl = insertArbore(avl, head);
+        avl = inserareEchipaInArbore(avl, head);
         echipa *aux = head;
-        eliberareMemorieListeEchipe(head);
+        free(head);
         head = head->next;
     }while(head != NULL);
-    fprintf(f_out, "THE LEVEL 2 TEAMS ARE: \n");
-    printLevel(f_out, avl, 2); 
+    fprintf(f_out, "\nTHE LEVEL 2 TEAMS ARE: \n");
+    afisareNivel(f_out, avl, 2); 
+}
+//eliberare memorie
+void eliberareListaJucatori(jucator *head)
+{
+    jucator *aux;
+    while(head != NULL)
+    {
+        aux = head;
+        head = head->next;
+        free(aux->nume);
+        free(aux->prenume);
+        free(aux);
+    }
+}
+void eliberareListaEchipe(echipa *head)
+{
+    echipa *aux;
+    while(head != NULL)
+    {
+        aux = head;
+        head = head->next;
+        jucator *aux1 = head->jucatori;
+        while(head->jucatori != NULL)
+        {
+            aux1 = head->jucatori;
+            head->jucatori = head->jucatori->next;
+            eliberareListaJucatori(aux1);
+        }
+    }
+}
+void eliberareStiva(stiva *top)
+{
+    stiva *aux;
+    while(!stivaEsteGoala(top))
+    {
+        aux = top;
+        top = top->next;
+        eliberareListaEchipe(aux->echipe);
+        free(aux);
+    }
+}
+void eliberareTop8(top8 *head)
+{
+    top8 *aux;
+    while(head != NULL)
+    {
+        aux = head;
+        head = head->next;
+        free(aux->castigatoare->nume);
+        free(aux);
+    }
+}
+void eliberareArbore(arbore *root)
+{
+    if(root != NULL)
+    {
+        eliberareArbore(root->left);
+        eliberareArbore(root->right);
+        eliberareListaEchipe(root->echipe);
+        free(root);
+    }
 }
