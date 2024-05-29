@@ -1,0 +1,15 @@
+Cerinta 1
+Am creat doua structuri. O structura pentru jucatori si o structura pentru echipe care contine jucatorii. Atat jucatorii cat si echipele sunt liste inlantuite. Fiecare jucator are nume si prenume (alocate dinamic), un punctaj si un pointer catre urmatorul jucator. Fiecare echipa are lista de jucatori, numar de jucatori, nume (alocat dinamic), pointer catre urmatoarea echipa din lista. Am citit informatiile din fisierul d.in si le am adaugat la inceputul listei pentru echipe.
+
+Cerinta 2
+Am adaugat la structura echipa un nou camp unde am calculat punctajul pe echipa. Apoi intr-o functie am calculat punctajul minim al tuturor echipelor, functie pe care o voi folosi repetat in functia de eliminare a echipelor din lista, aplicandu-se echipelor ramase. In functia de eliminare am calculat puterea lui 2 cea mai apropiata de numarul de echipe si am tot eliminat echipe pana am ajuns la numarul de echipe dorit. Am afisat echipele ramase intr-un fisier.
+
+Cerinta 3
+Am creat 4 structuri de date noi pentru stiva, coada, meci, si pentru o lista noua in care retin primii 8 castigatori. Structura meci contine 2 echipe si un pointer catre urmatorul meci. Coada contine de tip meci front si rear, stiva contine o echipa si un pointer catre urmatorul element din stiva. Top8 contine echipa castigatoare si un pointer catre urmatoarea echipa castigatoare.
+Am adaugat echipele din lista de echipe de mai sus 2 cate 2 in coada pentru a forma meciurile. Cat timp inca aveam echipe cu care sa fac meciuri, mai intai am afisat intr-un fisier intre cine si cine se tine meciul. Apoi cu ajutorul unei functii am aflat echipele castigatoare si necastigatoare in functie de punctaj, iar daca punctajul era la fel, luam ca fiind castigatoare echipa introdusa prima in coada de meciuri si echipelor castigatoare le-am adaugat un punct la punctajul total. Pe castigatori i-am afisat si dupa i-am adaugat in 2 stive separate. Am golit stiva de necastigatori, iar cu echipele din stiva castigatorilor am realizat meciuri. Am repetat pasii acestia pana la aflarea echipelor de pe primele 8 locuri pe care le am adaugat in lista mentionata mai sus, si apoi am continuat sa fac meciuri pana la aflarea castigatorului.
+
+Cerinta 4
+Am creat o structura noua pentru BST numita clasament care contine echipele si pointeri catre left si right. Am adaugat in BST cele 8 echipe conform punctajului in ordine crescatoare, tinand cont ca daca au acelasi punctaj, le pun in functie de nume, descrescator. Continutul BST-ului l-am afisat in ordine descrescatoare in fisier.
+
+Cerinta 5
+Am creat o structura noua pentru AVL care contine inaltimea sa, echipele si pointer catre left si right. Am adaugat echipele din BST in AVL tinand cont de aceeasi regula ca mai sus.In timpul inserarii, a trebuit sa tin cont ca arborele sa fie echilibrat asa ca am calculat de fiecare daca factorul de echilibru al nodului stramos iar daca arborele nu era echilibrat, l-am echilibrat cu ajutorul rotirilor la stanga, dreapta, stanga-dreapta si dreapta-stanga. Apoi dupa ce l-am creat, am afisat intr-un fisier echipele de pe nivelul al doilea al AVL-ului.
